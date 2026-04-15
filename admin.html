@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Safety-Sync | Admin Command Center</title>
+    <link rel="shortcut icon" href="#">
+
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+
+
+    <style>
+        :root {
+            --bg: #0d0d0d;
+            --card: #1a1a1a;
+            --alert: #ff0033;
+            --text: #e0e0e0;
+        }
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0; padding: 40px;
+        }
+        h1 {
+            border-bottom: 2px solid var(--alert);
+            padding-bottom: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        #stats { display: flex; gap: 20px; margin-bottom: 30px; }
+        .stat-box { background: #333; padding: 20px; border-radius: 8px; flex: 1; text-align: center; }
+
+        .map-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background-color: #0ccd0c;
+            color: white !important;
+            text-decoration: none !important;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-family: sans-serif;
+            border: none;
+            font-size: smaller;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(0, 255, 8, 0.3);
+        }
+
+        .map-btn:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+        }
+
+        .map-btn:active {
+            transform: translateY(0);
+        }
+
+        .resolve-btn {
+            background-color: #ff0033;
+            color: white !important;
+            text-decoration: none !important;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-family: sans-serif;
+            border: none;
+            font-size: smaller;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3);
+        }
+
+        #monitoring-panel {
+    background: rgba(26, 26, 26, 0.9);
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 25px;
+    margin-top: 40px; /* This creates the gap from the alerts above */
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.journey-badge {
+    background: #2a2a2a;
+    border-left: 4px solid #007bff;
+    padding: 10px 15px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.expired-text {
+    color: #ff3b30;
+    font-weight: bold;
+    animation: blinker 1s linear infinite;
+}
+
+@keyframes blinker { 50% { opacity: 0; } }
+            
+        .alert-card {
+            background: var(--card);
+            border: 1px solid #333;
+            border-left: 8px solid var(--alert);
+            padding: 25px;
+            margin-top: 20px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(255, 0, 51, 0.1);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0% { box-shadow: 0 0 0px rgba(255,0,51,0); } 50% { box-shadow: 0 0 20px rgba(255,0,51,0.3); } 100% { box-shadow: 0 0 0px rgba(255,0,51,0); } }
+    </style>
+</head>
+<body>
+
+<div id="overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:9999; display:flex; justify-content:center; align-items:center; flex-direction:column;">
+    <h1 style="color:var(--alert); margin-bottom:20px;">Safety-Sync Command Center</h1>
+    <p style="color:white; margin-bottom:30px;">Click to initialize secure connection and audio alerts.</p>
+    <button id="start-btn" onclick="activateDashboard()" style="padding:20px 50px; background:var(--alert); color:white; border:none; border-radius:5px; font-size:1.2rem; cursor:pointer; font-weight:bold;">🚀 START SYSTEM</button>
+</div>
+
+<div id="main-dashboard" style="display:none;">
+    <h1>🚨 Live Emergency Feed</h1>
+    <div id="stats">
+        <div class="stat-box">Total Alerts: <span id="count">0</span></div>
+        <div class="stat-box">Status: <span id="status-text" style="color: #00ff00;">Initializing...</span></div>
+    </div>
+    <div id="alert-container"></div>
+
+    <div id="monitoring-panel" style="background: #222; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #444;">
+        <h3 style="color: #007bff; margin-top: 0;">🛰️ Proactive Monitoring</h3>
+        <p>Students currently on journeys: <span id="active-count" style="font-weight: bold; color: white;">0</span></p>
+    <div id="active-list" style="display: flex; flex-wrap: wrap; gap: 10px;"></div>
+</div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+<script>
+    let sirenAudio = new Audio('siren.mp3');
+
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyAG_E5aduSJ4_LfYMyo8Lw2MCBCGFP-MKs",
+        authDomain: "safety-sync-efb60.firebaseapp.com",
+        projectId: "safety-sync-efb60",
+        storageBucket: "safety-sync-efb60.firebasestorage.app",
+        messagingSenderId: "498372373785",
+        appId: "1:498372373785:web:5ea393a85b55a5499da988",
+        measurementId: "G-5YELE70MVR"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    console.log("✅ Command Center: Firebase Handshake Complete.");
+
+    // FIX 3: Separated activateDashboard from armSystem
+    async function activateDashboard() {
+        document.getElementById('overlay').style.display = 'none';
+        document.getElementById('main-dashboard').style.display = 'block';
+        document.getElementById('status-text').innerText = "System Online";
+
+        // MOCK AUDIO UNLOCK (Ensures siren can play later)
+        const unlockAudio = new Audio('notification.mp3');
+        unlockAudio.volume = 0;
+        try {
+            await unlockAudio.play();
+            console.log("Audio Engine Unlocked");
+        } catch (e) { console.log("Audio unlock handled"); }
+
+        // Check Connection
+        db.doc(".info/connected").onSnapshot((snapshot) => {
+            const connected = snapshot.data()?.connected;
+            const light = document.getElementById('connection-light');
+            const text = document.getElementById('connection-text');
+            light.style.background = connected ? "#34c759" : "#ff3b30";
+            light.style.boxShadow = connected ? "0 0 10px #34c759" : "0 0 10px #ff3b30";
+            text.innerText = connected ? "Cloud Sync: Online" : "Cloud Sync: Disconnected";
+        });
+
+        startFirebaseListener();
+        startMonitoringListener();
+    }
+
+    function startFirebaseListener() {
+        console.log("Listening for incidents...");
+        // FIX 4: Removed .orderBy temporarily to prevent Indexing errors during demo
+        db.collection("incidents").onSnapshot((snapshot) => {
+            document.getElementById('count').innerText = snapshot.size;
+            
+            snapshot.docChanges().forEach((change) => {
+                const docId = change.doc.id;
+                const data = change.doc.data();
+
+                if (change.type === "added") {
+                    // PREVENT DUPLICATE CARDS ON REFRESH
+                     if (document.getElementById(`card-${docId}`)) return;
+
+                    console.log("📥 New Alert:", data);
+                    
+                    const displayName = data.userName || "🚨 UNKNOWN USER";
+                    const displayPhone = data.contact || "No Number";
+
+                    const cardHtml = `
+                        <div class="alert-card" id="card-${docId}">
+                            <div>
+                                <h2 style="margin:0; color:#ff3b30;">⚠️ ${displayName}</h2>
+                                <p>Location: ${data.location}</p>
+                                <p style="margin:5px 0 0 0; color:white;">Contact: ${displayPhone}</p>
+                                <small style="color: #666;">ID: ${docId}</small>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 10px; min-width: 160px;">
+                                
+                            <a href="${data.mapLink}" target="_blank" class="map-btn" style="width: 100%; justify-content: center; box-sizing: border-box;">
+                                📍 VIEW ON MAP
+                             </a>
+                            <button class="resolve-btn" onclick="deleteIncident('${docId}', '${displayName}')" style="width: 100%;">
+                                RESOLVE
+                            </button>
+                            </div>
+                        </div>`;
+                    
+                    document.getElementById('alert-container').insertAdjacentHTML('afterbegin', cardHtml);
+                    
+                    // Trigger Siren Sound
+                    new Audio('notification.mp3').play();
+                }
+
+                if (change.type === "removed") {
+                    const element = document.getElementById(`card-${docId}`);
+                    if (element) element.remove();
+                }
+            });
+        }, (error) => {
+            console.error("FIREBASE ERROR:", error.message);
+        });
+    }
+
+function startMonitoringListener() {
+    console.log("🛰️ Monitoring active journeys...");
+    const countElement = document.getElementById('active-count');
+    const listElement = document.getElementById('active-list');
+
+    db.collection("active_watches")
+      .where("status", "in", ["ON_WAY", "SNOOZED"]) // BUG FIX: Catch snoozed users too!
+      .onSnapshot((snapshot) => {
+          // 1. Update the Big Number Immediately
+          countElement.innerText = snapshot.size;
+          
+          // 2. Clear the list to prevent duplicates
+          listElement.innerHTML = ""; 
+
+          if (snapshot.empty) {
+              listElement.innerHTML = "<p style='color:#666; font-style:italic;'>No active journeys at this time.</p>";
+              return;
+          }
+
+          snapshot.forEach((doc) => {
+              const data = doc.data();
+              const now = Date.now();
+              const diff = data.expectedEndTime - now;
+              const minsLeft = Math.ceil(diff / 60000);
+
+              // Calculate Heartbeat
+              let lastSeenStr = "Connecting...";
+              if (data.lastHeartbeat) {
+                  const secondsAgo = Math.floor((Date.now() - data.lastHeartbeat.toMillis()) / 1000);
+                  lastSeenStr = secondsAgo < 60 ? `${secondsAgo}s ago` : `${Math.floor(secondsAgo/60)}m ago`;
+              }
+
+              // Color coding based on status
+              const statusColor = data.status === "SNOOZED" ? "#ffcc00" : "#007bff";
+
+              const badge = `
+                <div class="journey-badge" style="border-left: 4px solid ${statusColor}; margin-bottom:10px; width: 100%;">
+                    <div style="display:flex; align-items:center; justify-content:space-between; width: 100%;">
+                        <span>
+                            <strong style="color:white;">${data.userName || 'Anonymous'}</strong> 
+                            <small style="color:${statusColor}; margin-left:10px;">[${data.status}]</small>
+                        </span>
+                        <span style="font-size:0.8rem; color:#0f0;">⏱️ ${minsLeft}m left</span>
+                    </div>
+                    <div style="font-size:0.75rem; color:#aaa; margin-top:5px;">
+                        🔋 ${data.battery || 'N/A'} | 📡 ${lastSeenStr} | 📍 ${data.lastKnownLocation || 'Waiting for GPS...'}
+                    </div>
+                </div>`;
+              listElement.insertAdjacentHTML('beforeend', badge);
+          });
+      }, (error) => {
+          console.error("❌ Monitoring Listener Failed:", error);
+      });
+}
+
+// Helper function to move data from 'Watches' to 'Incidents'
+async function triggerDeadManAlert(watchId, data) {
+    try {
+        // 1. Create the Emergency Incident
+        await db.collection("incidents").add({
+            userName: data.userName,
+            contact: data.contact,
+            location: data.lastKnownLocation || "🚨 AUTO-TRIGGER: Dead-Man's Switch (Time Expired)",
+            status: "EMERGENCY",
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            mapLink: data.lastMapLink || "#" // Fallback since phone is likely off
+        });
+
+        // 2. Mark the watch as handled so it disappears from Monitoring
+        await db.collection("active_watches").doc(watchId).update({
+            status: "EXPIRED_TRIGGERED"
+        });
+
+        console.log(`⚠️ Dead-Man's Switch fired for ${data.userName}`);
+    } catch (e) {
+        console.error("Trigger failed:", e);
+    }
+}
+
+async function clearAllOldWatches() {
+    const now = Date.now();
+    const snapshot = await db.collection("active_watches")
+    .where("status", "in", ["ON_WAY", "SNOOZED"]) // Check both active states
+    .get();
+    
+    snapshot.forEach(async (doc) => {
+        const data = doc.data();
+        // If the timer is in the past, mark it as 'RESOLVED' or 'EXPIRED' 
+        // so the Watchdog stops picking it up.
+        if (data.expectedEndTime < now) {
+            await db.collection("active_watches").doc(doc.id).update({
+                status: "ARCHIVED_EXPIRED"
+            });
+            console.log(`🧹 Cleaned up old watch for: ${data.userName}`);
+        }
+    });
+    alert("Database Cleaned! Old journeys will no longer trigger alerts.");
+}
+
+// Call this once manually
+// clearAllOldWatches();
+
+// Inside admin.html
+setInterval(async () => {
+    const now = Date.now();
+    
+    // 1. ONLY look for users who are still 'ON_WAY'
+    const snapshot = await db.collection("active_watches")
+        .where("status", "==", "ON_WAY")
+        .get();
+
+    snapshot.forEach(async (doc) => {
+        const data = doc.data();
+        
+        // 2. If they are late...
+        if (now >= data.expectedEndTime) {
+            
+            // 🔥 THE FIX: Change status to 'ALERT_SENT' IMMEDIATELY
+            // This 'locks' the record so this loop ignores it 5 seconds from now.
+            await db.collection("active_watches").doc(doc.id).update({
+                status: "ALERT_SENT"
+            });
+
+            // 3. ONLY THEN create the alert
+            await db.collection("incidents").add({
+                userName: data.userName,
+                originalWatchId: doc.id, 
+                contact: data.contact,
+                location: data.lastKnownLocation || "🚨 Dead-Man's Switch Triggered",
+                mapLink: data.lastMapLink || "#",
+                status: "EMERGENCY",
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            console.log(`⚠️ Emergency logic locked for ${data.userName}. No more duplicates.`);
+        }
+    });
+}, 5000); // Check every 5 seconds for the demo
+
+async function deleteIncident(incidentId, userName) {
+    if(confirm(`Confirm: Has ${userName} been secured?`)) {
+        // 1. Delete the Alert
+        await db.collection("incidents").doc(incidentId).delete();
+
+        // 2. Find and Clean the Active Watch for this user
+        const watchQuery = await db.collection("active_watches")
+            .where("userName", "==", userName)
+            .get();
+
+        watchQuery.forEach(async (doc) => {
+            await db.collection("active_watches").doc(doc.id).delete();
+        });
+
+        console.log("✅ Incident and Active Watch fully cleared.");
+    }
+}
+
+
+</script>
+</body>
+</html>

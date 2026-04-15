@@ -1,0 +1,337 @@
+/* OLED Battery Saver Theme */
+:root {
+    --bg-color: #000000;
+    --card-bg: #111111;
+    --text-primary: #e0e0e0;
+    --accent-color: #00ffb3; /* Cyber Blue */
+    --danger-color: #ff3b30; /* iOS Red */
+    --success-color: #34c759;
+    --border-color: #222222;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+.container {
+    width: calc(100% - 40px);
+    max-width: 420px;
+
+    height: calc(100% - 60px);
+    max-height: 800px;
+    
+    scale: 92%;
+
+    background: var(--card-bg);
+    padding: 30px;
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    text-align: center;
+    box-shadow: 0 0px 30px rgba(69, 12, 95, 0.6);
+}
+
+h2 {
+    font-weight: 300;
+    letter-spacing: 1px;
+    margin-bottom: 25px;
+    color: var(--text-primary);
+}
+
+#timer-display {
+    font-size: 4rem;
+    font-weight: 200;
+    font-family: monospace;
+    margin: 20px 0;
+    color: var(--accent-color);
+    text-shadow: 0 0 15px rgba(0, 123, 255, 0.3);
+}
+
+/* Inputs */
+input {
+    width: 100%;
+    background: #1a1a1a;
+    border: 1px solid var(--border-color);
+    color: white;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    font-size: 1rem;
+    outline: none;
+    transition: border 0.3s;
+}
+
+input:focus {
+    border-color: var(--accent-color);
+}
+
+/* Buttons */
+button {
+    width: 100%;
+    padding: 15px;
+    border-radius: 10px;
+    border: none;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.1s, opacity 0.3s;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+.btn-start {
+    background-color: var(--accent-color);
+    color: white;
+}
+
+.btn-safe {
+    background-color: var(--success-color);
+    color: white;
+    margin-top: 10px;
+}
+
+.btn-back {
+    background-color: var(--success-color);
+    color: white;
+    margin-top: 10px;
+}
+
+.btn-save {
+    background-color: var(--text-primary);
+    color: black;
+}
+
+#settings-btn {
+    background: transparent;
+    color: #666;
+    margin-top: 20px;
+    font-size: 0.9rem;
+}
+
+/* Warning Text */
+.warning-text {
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 15px;
+    line-height: 1.4;
+}
+
+/* Animations */
+
+/* @keyframes flickerRed {
+    0% { border-color: #ff3b30; box-shadow: 0 0 10px #ff3b30; }
+    50% { border-color: #111; box-shadow: none; }
+    100% { border-color: #ff3b30; box-shadow: 0 0 10px #ff3b30; }
+}
+
+.emergency-active {
+    animation: flickerRed 0.5s infinite; /* Fast flickering */
+    /* background-color: #1a0000 !important;
+} */ 
+
+/* Shake Keyframes */
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    50% { transform: translateX(8px); }
+    75% { transform: translateX(-8px); }
+    100% { transform: translateX(0); }
+}
+
+.shake-error {
+    animation: shake 0.4s ease-in-out;
+    border: 2px solid #ff3b30 !important; /* Glows red during shake */
+}
+
+/* IMPORTANT: Change pointer-events so click works while disabled */
+#start-session-btn {
+    pointer-events: auto !important;    
+    transition: opacity 0.3s, transform 0.2s;   
+}
+
+#start-session-btn:disabled {
+    cursor: not-allowed;
+}
+
+
+@keyframes emergency-flicker {
+    0% { background-color: #111; }
+    50% { background-color: #640505; }
+    100% { background-color: #111; }
+}
+
+.emergency-active {
+    animation: emergency-flicker 2s infinite !important;
+    border-color: var(--danger-color);
+}
+
+.heartbeat-dot {
+    height: 8px;
+    width: 8px;
+    background-color: #007bff;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+    box-shadow: 0 0 0 0 rgba(0, 123, 255, 1);
+    animation: pulse-blue 2s infinite;
+}
+
+#start-session-btn:disabled {
+    opacity: 0.5 !important;
+    background-color: #333 !important;
+    pointer-events: none;
+}
+
+#start-session-btn:not(:disabled) {
+    opacity: 1 !important;
+    background-color: #00ffff !important;
+    color: #000 !important;
+    pointer-events: auto;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+}
+
+/* 1. Target the class we put on the inputs */
+.no-spin::-webkit-outer-spin-button,
+.no-spin::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* 2. Fix for Firefox */
+.no-spin {
+    appearance: textfield !important;
+}
+
+/* 3. Extra cleanup for your minimalist look */
+#input-hours, #input-mins {
+    outline: none;
+    border-bottom: 2px solid #333;
+    transition: border-color 0.3s;
+}
+
+#input-hours:focus, #input-mins:focus {
+    border-bottom-color: #00ffff;
+}
+
+.legal-consent-wrapper label {
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: pointer;
+}
+
+#tos-check {
+    cursor: pointer;
+    transform: scale(1.2); /* Makes it easier to hit on small screens */
+}
+
+/* Removes arrows from number inputs */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    appearance: textfield;
+}
+
+/* Highlighting effect when user clicks to type */
+input:focus {
+    border-bottom-color: #00ffff !important;
+    transition: 0.3s;
+}
+
+@keyframes pulse-blue {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.7);
+    }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 10px rgba(0, 123, 255, 0);
+    }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(0, 123, 255, 0);
+    }
+}
+
+.last-seen-text {
+    font-size: 0.75rem;
+    color: #888;
+    margin-left: 5px;
+}
+
+.input-group {
+    position: relative; /* This is the anchor for the eye */
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 15px;
+    padding-right: 45px; /* Extra padding so text doesn't go under the eye */
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 10px;
+    color: white;
+    font-size: 1rem;
+    outline: none;
+}
+
+/* 2. Unified Eye Styling */
+.toggle-eye, .toggle-eye-stop {
+    position: absolute;
+    right: 15px;          /* Fixed distance from the RIGHT edge of the input */
+    top: 38%;             /* Perfectly centered vertically */
+    transform: translateY(-50%); 
+    cursor: pointer;
+    font-size: 1.2rem;
+    user-select: none;
+    opacity: 0.5;
+    transition: all 0.3s ease;
+    z-index: 10;          /* Ensures it stays on top of the input */
+    filter: grayscale(100%);
+}
+
+.toggle-eye:hover, .toggle-eye-stop:hover {
+    opacity: 1;
+}
+
+.toggle-eye:active, .toggle-eye-stop:active {
+    filter: grayscale(0%) saturate(100%) !important;
+    opacity: 1 !important;
+    transform: translateY(-50%) scale(1.1); /* Slightly larger when active */
+}
+
+/* Special state for when the timer is active */
+body.timer-running #settings-btn {
+    display: none !important;
+}
+
+/* Also hide it when settings are open */
+body.settings-open #settings-btn {
+    display: none !important;
+}
+
+button:hover {
+    filter: brightness(1.2);
+    transform: translateY(-2px);
+}

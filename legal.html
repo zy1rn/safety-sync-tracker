@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safety-Sync | Protocols</title>
+
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-192.png">   
+
+
+    <style>
+    :root {
+        --bg: #000000;
+        --card: #0a0a0a;
+        --accent: #00ffff;
+        --text-dim: #999999;
+        --text-bright: #ffffff;
+        --border: #1a1a1a;
+    }
+
+    body {
+        background-color: var(--bg);
+        color: var(--text-bright);
+        /* The most readable, minimal font stack */
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        margin: 0;
+        padding: 24px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 1050px; /* Narrower for better reading comfort */
+        margin: 0 auto;
+    }
+
+    h1 {
+        font-size: 1.4rem;
+        font-weight: 600; /* Bold but not chunky */
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .legal-section {
+        margin-bottom: 40px;
+    }
+
+    h2 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-bright);
+        border-left: 3px solid var(--accent);
+        padding-left: 12px;
+        margin-bottom: 20px;
+    }
+
+    .clause {
+        margin-bottom: 24px;
+    }
+
+    .clause-title {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--accent);
+        margin-bottom: 4px;
+        text-transform: uppercase;
+    }
+
+    .clause-text {
+        font-size: 0.95rem;
+        color: var(--text-dim);
+        margin: 0;
+    }
+
+    .back-link {
+        display: block;
+        text-align: center;
+        color: var(--accent);
+        text-decoration: none;
+        font-size: 0.9rem;
+        padding: 12px;
+        border: 1px solid #222;
+        border-radius: 8px;
+        margin-top: 40px;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Safety System Protocols</h1>
+    </header>
+
+    <div class="legal-section">
+        <h2>📜 TERMS OF SERVICE</h2>
+        <span class="timestamp">LAST UPDATED: MARCH 28, 2026</span>
+        
+        <div class="content-grid">
+            <div class="clause">
+                <span class="clause-title">1. ACCEPTANCE</span>
+                <p class="clause-text">By using Safety-Sync, you agree to these terms. This application is a safety tool designed for the Technocrats TIT campus community and must be used responsibly.</p>
+            </div>
+            <div class="clause">
+                <span class="clause-title">2. NATURE OF SERVICE</span>
+                <p class="clause-text">Safety-Sync is a "Dead-Man's Switch" monitoring tool. It is not a replacement for calling emergency services (e.g., 100 or 112). We do not guarantee immediate response from campus security or third parties.</p>
+            </div>
+            <div class="clause">
+                <span class="clause-title">3. USER RESPONSIBILITIES</span>
+                <p class="clause-text"><strong>Accuracy:</strong> You must provide a valid 4-digit PIN and active contact. <strong>Consent:</strong> By starting a timer, you explicitly consent to your location being broadcasted to the Admin Command Center if the timer expires. <strong>False Alarms:</strong> Repeated intentional triggers may result in suspension.</p>
+            </div>
+            <div class="clause">
+                <span class="clause-title">4. LIMITATION OF LIABILITY</span>
+                <p class="clause-text">Safety-Sync is not liable for injury or loss resulting from: Technical failures (GPS drift, battery death, internet loss) or delayed response from authorities.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="legal-section">
+        <h2>🔒 PRIVACY POLICY</h2>
+        <span class="timestamp">ENCRYPTION PROTOCOL: ACTIVE</span>
+        
+        <div class="content-grid">
+            <div class="clause">
+                <span class="clause-title">1. DATA WE COLLECT</span>
+                <p class="clause-text"><strong>Identity:</strong> Name and contact. <strong>Real-Time Location:</strong> GPS coordinates are collected only while a safety timer is active. <strong>Heartbeats:</strong> Periodic updates are sent every 2 mins to ensure a "Last Known Position" (LKP) is available.</p>
+            </div>
+            <div class="clause">
+                <span class="clause-title">2. UTILIZATION</span>
+                <p class="clause-text"><strong>Emergency Trigger:</strong> If a timer expires, data is transmitted to the Command Center. <strong>Live Monitoring:</strong> Admins see a "Pulsing" status to confirm you are connected to the safety mesh.</p>
+            </div>
+            <div class="clause">
+                <span class="clause-title">3. DATA RETENTION</span>
+                <p class="clause-text"><strong>Temporary Storage:</strong> Active data resides in a live Firebase collection. <strong>Archiving:</strong> Upon "Safe Arrival," tracking data is moved to a "History" log and purged from the active feed. Data is shared only with designated Security personnel.</p>
+            </div>
+            <div class="clause">
+                <span class="clause-title">4. PERMISSIONS</span>
+                <p class="clause-text">This app requires: Location Access (Journey tracking) and Notification/Audio (Siren triggers).</p>
+            </div>
+        </div>
+    </div>
+
+    <a href="index.html" class="back-link" onclick="window.close();">RETURN TO INTERFACE</a>
+</div>
+
+</body>
+</html>
