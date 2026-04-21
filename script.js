@@ -136,10 +136,10 @@ async function startProtocol() {
 
     // 1. THE HARD GATE: Check PIN first
     const storedPin = localStorage.getItem('user_safe_pin');
-    if (!storedPin) {
-        alert("🚨 SECURITY ERR: You must set a 4-digit PIN in Settings before starting.");
-        toggleSettings();
-        return;
+    if (!storedPin || storedPin === "") {
+        alert("🚨 SECURITY ERROR: You must set a 4-digit PIN in Settings first!");
+        toggleSettings(); // This opens the popup/area we created
+        return; // 🔥 STOP THE CODE HERE
     }
 
     try {
